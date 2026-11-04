@@ -1,0 +1,19 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#0b0b10">
+<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="iPack"><title>iPack</title><link rel="stylesheet" href="/src/style.css"></head><body>
+<header><h1>iPack</h1><button id="howBtn" class="ghost">How to set</button></header>
+<nav id="tabs"></nav>
+<main><div id="stage"><div id="phone"><canvas id="cv"></canvas><div id="lock" class="on"><div class="date"></div><div class="time"></div></div></div></div>
+<section id="ctrl">
+ <div class="row"><button id="rand" class="primary">🎲 Randomize</button><button id="save" class="primary alt">⬇︎ Save</button><button id="fav" class="ghost">♡</button></div>
+ <div class="row wrap" id="pal"></div>
+ <div class="row wrap"><label class="chk"><input type="checkbox" id="amoled"> AMOLED black</label><label class="chk"><input type="checkbox" id="lockT" checked> Lock-screen preview</label></div>
+ <div id="textOpts" class="row wrap"><input id="txt" placeholder="Your quote…" value="Stay hungry. Stay foolish."><select id="font"><option value="Georgia, serif">Serif</option><option value="-apple-system, Helvetica, sans-serif">Sans</option><option value="'Courier New', monospace">Mono</option><option value="'Brush Script MT', cursive">Script</option><option value="Impact, sans-serif">Bold</option></select></div>
+ <div class="row wrap"><select id="device"></select><span id="res" class="muted"></span></div>
+ <h3>Favorites</h3><div id="gallery"></div>
+</section></main>
+<div id="how" class="modal hidden"><div><h2>Set as wallpaper</h2><ol><li>Tap <b>Save</b> → <b>Save Image</b> (goes to Photos).</li><li>Open <b>Photos</b>, open the image.</li><li>Tap <b>Share</b> → <b>Use as Wallpaper</b>.</li><li>Adjust, then <b>Add</b> / set for Lock or Home Screen.</li></ol><p class="muted">iOS doesn't let apps set wallpaper automatically. Add this app to your Home Screen via Safari → Share → Add to Home Screen.</p><button class="primary" id="howClose">Got it</button></div></div>
+<script type="module" src="/src/main.js"></script></body></html>
