@@ -143,16 +143,25 @@ function genThumb(cat, i) { const k = cat + i; if (gthumbs[k]) return gthumbs[k]
   paint(c, 180, 390, { cat, seed: 777 + ci * 97 + i * 7919, pal: (cat === 'Heroes' ? HERO_PALS[i % HERO_PALS.length] : PALS[(ci + i) % PALS.length]).slice(), text: 'Be you.', font: FONTS[0][1], variant: cat === 'Island' ? i % 5 : undefined, scale: .4 });
   return gthumbs[k] = c.toDataURL('image/jpeg', .8); }
 const TABS = ['Art', 'Photos', ...CATS];
-let tab = 'Art', items = [], focus = 0, sound = false, ac;
-function tick() { if (!sound) return; ac ||= new AudioContext(); const o = ac.createOscillator(), g = ac.createGain(); o.frequency.value = 1320; g.gain.setValueAtTime(.04, ac.currentTime); g.gain.exponentialRampToValueAtTime(.0001, ac.currentTime + .08); o.connect(g).connect(ac.destination); o.start(); o.stop(ac.currentTime + .09); }
-$('#snd').onclick = () => { sound = !sound; $('#snd').textContent = sound ? '♪' : '♪̸'; $('#snd').classList.toggle('on', sound); tick(); };
+let tab = 'Art', items = [], focus = 0, sound = localStorage.ipackSnd !== '0', ac;
+function actx() { ac ||= new (window.AudioContext || window.webkitAudioContext)(); if (ac.state === 'suspended') ac.resume(); return ac; }
+function tone(f, d, v, t0 = 0, type = 'sine', f2) { const a = actx(), t = a.currentTime + t0, o = a.createOscillator(), g = a.createGain(); o.type = type; o.frequency.setValueAtTime(f, t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + d); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + .003); g.gain.exponentialRampToValueAtTime(.0001, t + d); o.connect(g).connect(a.destination); o.start(t); o.stop(t + d + .02); }
+function tick() { if (!sound) return; try { tone(2100, .032, .05); } catch {} }
+function pop() { if (!sound) return; try { tone(880, .06, .09, 0, 'sine', 520); tone(1760, .035, .04, .012, 'triangle'); } catch {} }
+function whoosh() { if (!sound) return; try { const a = actx(), n = a.sampleRate * .22, b = a.createBuffer(1, n, a.sampleRate), d = b.getChannelData(0); for (let i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.sin(Math.PI * i / n) ** 2; const s = a.createBufferSource(), f = a.createBiquadFilter(), g = a.createGain(), t = a.currentTime; s.buffer = b; f.type = 'bandpass'; f.Q.value = 1.2; f.frequency.setValueAtTime(500, t); f.frequency.exponentialRampToValueAtTime(2600, t + .2); g.gain.value = .06; s.connect(f).connect(g).connect(a.destination); s.start(); } catch {} }
+addEventListener('touchstart', () => { if (sound) { const a = actx(); const s = a.createBufferSource(); s.buffer = a.createBuffer(1, 1, 22050); s.connect(a.destination); s.start(); } }, { once: true, passive: true });
+addEventListener('click', e => { const b = e.target.closest('button'); if (b && !b.closest('#tiles,#ctabs,#iconPack') && b.id !== 'snd') pop(); }, true);
+function setVH() { const sa = navigator.standalone || matchMedia('(display-mode: standalone)').matches; let h = Math.max(innerHeight, document.documentElement.clientHeight); if (sa && screen.height > h && Math.abs(screen.width - innerWidth) < 2) h = screen.height; document.documentElement.style.setProperty('--app-h', h + 'px'); }
+setVH(); addEventListener('resize', setVH); addEventListener('orientationchange', () => setTimeout(setVH, 300)); visualViewport?.addEventListener('resize', setVH);
+setTimeout(() => { $('#snd').textContent = sound ? '♪' : '♪̸'; $('#snd').classList.toggle('on', sound); });
+$('#snd').onclick = () => { sound = !sound; localStorage.ipackSnd = sound ? '1' : '0'; $('#snd').textContent = sound ? '♪' : '♪̸'; $('#snd').classList.toggle('on', sound); tick(); };
 function itemsFor(t) { if (t === 'Art') return ART.map(x => itemOf(x, 'art')); if (t === 'Photos') return PHOTOS.map(x => itemOf(x, 'photo'));
   const ci = CATS.indexOf(t); return [...ART.filter(x => x.category === t).map(x => itemOf(x, 'art')), ...Array.from({ length: 8 }, (_, i) => ({ kind: 'gen', cat: t, i, title: `${t} · Style ${i + 1}`, thumb: genThumb(t, i), seed: 777 + ci * 97 + i * 7919, pal: (t === 'Heroes' ? HERO_PALS[i % HERO_PALS.length] : PALS[(ci + i) % PALS.length]).slice() })), ...PHOTOS.filter(x => x.category === t).map(x => itemOf(x, 'photo'))]; }
 let loaded = null;
 async function explore() { loaded ||= Promise.all([fetch(BASE + 'art/art.json').then(r => r.json()).catch(() => []), fetch(BASE + 'photos/credits.json').then(r => r.json()).catch(() => [])]).then(([a, p]) => { ART = a; PHOTOS = p; });
   await loaded; if ($('#ctabs').children.length) return;
   $('#ctabs').innerHTML = TABS.map(t => `<button data-t="${t}" class="${t === tab ? 'on' : ''}">${t === 'Art' ? 'Featured Art' : t}</button>`).join(''); setTab(tab); }
-$('#ctabs').onclick = e => { const b = e.target.closest('button'); if (b) { tick(); setTab(b.dataset.t); b.scrollIntoView({ inline: 'center', behavior: 'smooth', block: 'nearest' }); } };
+$('#ctabs').onclick = e => { const b = e.target.closest('button'); if (b) { whoosh(); setTab(b.dataset.t); b.scrollIntoView({ inline: 'center', behavior: 'smooth', block: 'nearest' }); } };
 function setTab(t) { tab = t; $$('#ctabs button').forEach(b => b.classList.toggle('on', b.dataset.t === t)); items = itemsFor(t);
   $('#tiles').innerHTML = items.map((it, i) => `<button class="tile" data-i="${i}"><span style="background-image:url('${it.thumb}')"></span><b>${it.title}</b></button>`).join('') + '<div class="tail"></div>';
   $('#tiles').scrollLeft = 0; setFocus(0); $('#ctabs button.on')?.scrollIntoView({ inline: 'center', block: 'nearest' }); }
@@ -225,4 +234,4 @@ setInterval(() => $('#v-create').classList.contains('on') && overlay(cv.width, c
 setTimeout(() => $('#hint').style.opacity = 0, 3500);
 show((location.hash.slice(1) || 'explore').split('?')[0]);
 if (q.get('sheet') && !q.get('art')) setTimeout(() => openSheet(q.get('sheet')), 300);
-if ('serviceWorker' in navigator && import.meta.env.PROD) navigator.serviceWorker.register(import.meta.env.BASE_URL + 'sw.js');
+if ('serviceWorker' in navigator && import.meta.env.PROD) { const had = !!navigator.serviceWorker.controller; navigator.serviceWorker.register(import.meta.env.BASE_URL + 'sw.js').then(r => r.update()); navigator.serviceWorker.addEventListener('controllerchange', () => had && location.reload()); }
