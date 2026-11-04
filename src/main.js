@@ -167,6 +167,7 @@ function setTab(t) { tab = t; $$('#ctabs button').forEach(b => b.classList.toggl
   lockScroll = Date.now() + 300; $('#tiles').scrollLeft = 0; setFocus(0); $('#ctabs button.on')?.scrollIntoView({ inline: 'center', block: 'nearest' }); }
 let lockScroll = 0; const tileAt = () => { const T = $('#tiles'), x = T.scrollLeft + 16; let best = 0, bd = 1e9; T.querySelectorAll('.tile').forEach((t, k) => { const d = Math.abs(t.offsetLeft - x); if (d < bd) { bd = d; best = k; } }); return best; };
 $('#tiles').onclick = e => { const b = e.target.closest('.tile'); if (!b) return; const i = +b.dataset.i; if (i === focus) return heroEdit(); lockScroll = Date.now() + 900; setFocus(i); requestAnimationFrame(() => b.scrollIntoView({ inline: 'start', behavior: 'smooth', block: 'nearest' })); };
+let ambFlip = false;
 let st0; $('#tiles').addEventListener('scroll', () => { clearTimeout(st0); st0 = setTimeout(() => { if (Date.now() < lockScroll) return; const i = tileAt(); if (i !== focus && items[i]) setFocus(i); }, 140); }, { passive: true });
 function setFocus(i) { focus = i; const it = items[i]; if (!it) return; tick(); $$('#tiles .tile').forEach((b, k) => b.classList.toggle('f', k === i));
   const L = $$('#amb .l'), on = L[ambFlip ? 0 : 1], off = L[ambFlip ? 1 : 0]; ambFlip = !ambFlip; on.style.backgroundImage = `url('${it.thumb}')`; on.classList.add('on'); off.classList.remove('on');
@@ -234,4 +235,4 @@ setInterval(() => $('#v-create').classList.contains('on') && overlay(cv.width, c
 setTimeout(() => $('#hint').style.opacity = 0, 3500);
 show((location.hash.slice(1) || 'explore').split('?')[0]);
 if (q.get('sheet') && !q.get('art')) setTimeout(() => openSheet(q.get('sheet')), 300);
-if ('serviceWorker' in navigator && import.meta.env.PROD) { const had = !!navigator.serviceWorker.controller; navigator.serviceWorker.register(import.meta.env.BASE_URL + 'sw.js').then(r => r.update()); navigator.serviceWorker.addEventListener('controllerchange', () => had && location.reload()); }
+if ('serviceWorker' in navigator && import.meta.env.PROD) { const had = !!navigator.serviceWorker.controller; navigator.serviceWorker.register(import.meta.env.BASE_URL + 'sw.js').then(r => r && r.update()); navigator.serviceWorker.addEventListener('controllerchange', () => had && location.reload()); }
