@@ -1,19 +1,50 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="theme-color" content="#0b0b10">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="iPack">
+<meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<meta name="color-scheme" content="light dark">
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<meta name="apple-mobile-web-app-title" content="iPack"><title>iPack</title><link rel="stylesheet" href="/src/style.css"></head><body>
-<header><h1>iPack</h1><button id="howBtn" class="ghost">How to set</button></header>
-<nav id="tabs"></nav>
-<main><div id="stage"><div id="phone"><canvas id="cv"></canvas><div id="lock" class="on"><div class="date"></div><div class="time"></div></div></div></div>
-<section id="ctrl">
- <div class="row"><button id="rand" class="primary">🎲 Randomize</button><button id="save" class="primary alt">⬇︎ Save</button><button id="fav" class="ghost">♡</button></div>
- <div class="row wrap" id="pal"></div>
- <div class="row wrap"><label class="chk"><input type="checkbox" id="amoled"> AMOLED black</label><label class="chk"><input type="checkbox" id="lockT" checked> Lock-screen preview</label></div>
- <div id="textOpts" class="row wrap"><input id="txt" placeholder="Your quote…" value="Stay hungry. Stay foolish."><select id="font"><option value="Georgia, serif">Serif</option><option value="-apple-system, Helvetica, sans-serif">Sans</option><option value="'Courier New', monospace">Mono</option><option value="'Brush Script MT', cursive">Script</option><option value="Impact, sans-serif">Bold</option></select></div>
- <div class="row wrap"><select id="device"></select><span id="res" class="muted"></span></div>
- <h3>Favorites</h3><div id="gallery"></div>
-</section></main>
-<div id="how" class="modal hidden"><div><h2>Set as wallpaper</h2><ol><li>Tap <b>Save</b> → <b>Save Image</b> (goes to Photos).</li><li>Open <b>Photos</b>, open the image.</li><li>Tap <b>Share</b> → <b>Use as Wallpaper</b>.</li><li>Adjust, then <b>Add</b> / set for Lock or Home Screen.</li></ol><p class="muted">iOS doesn't let apps set wallpaper automatically. Add this app to your Home Screen via Safari → Share → Add to Home Screen.</p><button class="primary" id="howClose">Got it</button></div></div>
+<title>iPack</title><link rel="stylesheet" href="/src/style.css"></head><body>
+<section id="v-explore" class="view scroll"><h1 class="large">Explore</h1><p class="sub">Original wallpapers, drawn on your iPhone.</p><div id="catList" class="group"></div></section>
+
+<section id="v-create" class="view">
+ <canvas id="cv"></canvas>
+ <svg id="ov" preserveAspectRatio="xMidYMid slice"><g id="ovIsland"></g><g id="ovClock"></g></svg>
+ <div id="sheet" class="sheet">
+  <div class="grab" id="grab"><span></span></div>
+  <div class="actions"><button id="rand" class="btn tinted">Shuffle</button><button id="save" class="btn filled">Save</button><button id="fav" class="btn round" aria-label="Favorite">♡</button></div>
+  <div class="chips" id="chips"></div>
+  <div class="more">
+   <div id="islandNote" class="note">The Dynamic Island itself can't be changed — these designs are built around it. Outline shows its approx. position for the chosen model.</div>
+   <div class="seg" id="variant"></div>
+   <div class="label">Preview</div><div class="seg" id="mode"></div>
+   <div class="group">
+    <label class="cell">AMOLED black<input type="checkbox" class="tog" id="amoled"></label>
+    <label class="cell">Island outline<input type="checkbox" class="tog" id="islandT" checked></label>
+    <div class="cell">Colors<span id="pal"></span></div>
+    <label class="cell">Device<select id="device"></select></label>
+    <div class="cell muted" id="res"></div>
+   </div>
+   <div id="textOpts"><div class="group"><div class="cell"><input id="txt" value="Stay hungry. Stay foolish." placeholder="Your quote"></div></div><div class="seg" id="font"></div></div>
+   <button class="btn plain" id="howBtn">How to set as wallpaper</button>
+  </div>
+ </div>
+ <div id="hint" class="hint">Tap the wallpaper to hide controls</div>
+</section>
+
+<section id="v-icons" class="view scroll"><h1 class="large">Icons</h1><p class="sub">Generic glyph icons that match your wallpaper palette.</p>
+ <div class="seg" id="iconStyle"></div>
+ <div id="iconGrid"></div>
+ <div class="row2"><button id="zip" class="btn filled">Save all (ZIP)</button></div>
+ <p class="sub">Tap an icon to share/save its 1024px PNG.</p>
+ <div class="label">Use as a Home Screen icon</div>
+ <div class="group"><ol class="steps"><li>Open <b>Shortcuts</b> → <b>+</b> New Shortcut</li><li>Add action <b>Open App</b> → pick the app</li><li>Tap <b>Share</b> → <b>Add to Home Screen</b></li><li>Tap the small icon → <b>Choose Photo</b> → pick the saved icon</li><li>Name it, tap <b>Add</b>. Hide the original app in App Library.</li></ol></div>
+</section>
+
+<section id="v-favs" class="view scroll"><h1 class="large">Favorites</h1><div id="gallery"></div></section>
+
+<nav id="tabbar"><button data-v="explore">◎<span>Explore</span></button><button data-v="create">✦<span>Create</span></button><button data-v="icons">▦<span>Icons</span></button><button data-v="favs">♡<span>Favorites</span></button></nav>
+
+<div id="how" class="modal hidden"><div class="sheet-card"><h2>Set as wallpaper</h2><ol class="steps"><li>Tap <b>Save</b> → <b>Save Image</b>.</li><li>Open <b>Photos</b> → the image → <b>Share</b> → <b>Use as Wallpaper</b>.</li><li>Adjust and tap <b>Add</b>.</li></ol><p class="sub">iOS doesn't allow apps to set wallpaper automatically. Tip: add iPack to your Home Screen (Safari → Share → Add to Home Screen) for full screen.</p><button class="btn filled" id="howClose">Got it</button></div></div>
 <script type="module" src="/src/main.js"></script></body></html>
