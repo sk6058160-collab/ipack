@@ -164,10 +164,10 @@ async function explore() { loaded ||= Promise.all([fetch(BASE + 'art/art.json').
 $('#ctabs').onclick = e => { const b = e.target.closest('button'); if (b) { whoosh(); setTab(b.dataset.t); b.scrollIntoView({ inline: 'center', behavior: 'smooth', block: 'nearest' }); } };
 function setTab(t) { tab = t; $$('#ctabs button').forEach(b => b.classList.toggle('on', b.dataset.t === t)); items = itemsFor(t);
   $('#tiles').innerHTML = items.map((it, i) => `<button class="tile" data-i="${i}"><span style="background-image:url('${it.thumb}')"></span><b>${it.title}</b></button>`).join('') + '<div class="tail"></div>';
-  $('#tiles').scrollLeft = 0; setFocus(0); $('#ctabs button.on')?.scrollIntoView({ inline: 'center', block: 'nearest' }); }
-$('#tiles').onclick = e => { const b = e.target.closest('.tile'); if (!b) return; if (+b.dataset.i === focus) return heroEdit(); setFocus(+b.dataset.i); b.scrollIntoView({ inline: 'start', behavior: 'smooth', block: 'nearest' }); };
-let st0; $('#tiles').addEventListener('scroll', () => { clearTimeout(st0); st0 = setTimeout(() => { const T = $('#tiles'), w = T.querySelector('.tile')?.offsetWidth + 12 || 1; const i = Math.round(T.scrollLeft / w); if (i !== focus && items[i]) setFocus(i); }, 90); });
-let ambFlip = false;
+  lockScroll = Date.now() + 300; $('#tiles').scrollLeft = 0; setFocus(0); $('#ctabs button.on')?.scrollIntoView({ inline: 'center', block: 'nearest' }); }
+let lockScroll = 0; const tileAt = () => { const T = $('#tiles'), x = T.scrollLeft + 16; let best = 0, bd = 1e9; T.querySelectorAll('.tile').forEach((t, k) => { const d = Math.abs(t.offsetLeft - x); if (d < bd) { bd = d; best = k; } }); return best; };
+$('#tiles').onclick = e => { const b = e.target.closest('.tile'); if (!b) return; const i = +b.dataset.i; if (i === focus) return heroEdit(); lockScroll = Date.now() + 900; setFocus(i); requestAnimationFrame(() => b.scrollIntoView({ inline: 'start', behavior: 'smooth', block: 'nearest' })); };
+let st0; $('#tiles').addEventListener('scroll', () => { clearTimeout(st0); st0 = setTimeout(() => { if (Date.now() < lockScroll) return; const i = tileAt(); if (i !== focus && items[i]) setFocus(i); }, 140); }, { passive: true });
 function setFocus(i) { focus = i; const it = items[i]; if (!it) return; tick(); $$('#tiles .tile').forEach((b, k) => b.classList.toggle('f', k === i));
   const L = $$('#amb .l'), on = L[ambFlip ? 0 : 1], off = L[ambFlip ? 1 : 0]; ambFlip = !ambFlip; on.style.backgroundImage = `url('${it.thumb}')`; on.classList.add('on'); off.classList.remove('on');
   const hp = $('.hp'); hp.classList.remove('in'); void hp.offsetWidth; hp.classList.add('in');
@@ -183,7 +183,7 @@ $('#heroEdit').onclick = heroEdit; $('.hp').onclick = heroEdit;
 $('#heroSet').onclick = async () => { const it = items[focus], [W, H] = size(), c = document.createElement('canvas');
   if (it.kind === 'gen') paint(c, W, H, { cat: it.cat, seed: it.seed, pal: it.pal, text: TXT, font: FONTS[0][1], variant: it.cat === 'Island' ? it.i % 5 : undefined, scale: scale() }); else drawCover(c, await loadImg(it.url), W, H);
   c.toBlob(b => shareBlob(b, `ipack-${it.kind === 'gen' ? it.cat.toLowerCase() + '-' + it.seed : it.file.replace('.webp', '')}-${W}x${H}.png`), 'image/png'); };
-$('#heroShuf').onclick = () => { const i = Math.floor(Math.random() * items.length); setFocus(i); $$('#tiles .tile')[i]?.scrollIntoView({ inline: 'start', behavior: 'smooth', block: 'nearest' }); };
+$('#heroShuf').onclick = () => { lockScroll = Date.now() + 900; const i = Math.floor(Math.random() * items.length); setFocus(i); $$('#tiles .tile')[i]?.scrollIntoView({ inline: 'start', behavior: 'smooth', block: 'nearest' }); };
 $('#heroInfo').onclick = () => { const it = items[focus], esc = s => String(s).replace(/</g, '&lt;');
   $('#infoBody').innerHTML = it.kind === 'photo' ? `<h2>${esc(it.title)}</h2><p>by ${esc(it.credit.author)}<br>License: <b>${esc(it.credit.license)}</b></p><p><a href="${it.credit.source}" target="_blank" rel="noopener">View source on Wikimedia Commons</a></p>`
     : it.kind === 'art' ? `<h2>${esc(it.title)}</h2><p>Original iPack artwork (AI-generated for iPack). Free to use as your wallpaper.</p>` : `<h2>${esc(it.title)}</h2><p>Drawn live on your device at full resolution — every shuffle is unique. Tap Customize to change palette, style and clock.</p>`;

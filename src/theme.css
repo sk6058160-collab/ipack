@@ -66,3 +66,13 @@ body.creating #tabbar{transform:translateY(110%)}
 .hero{align-items:stretch}.hp{height:auto;max-height:none;align-self:stretch;aspect-ratio:auto;flex:0 0 56%}
 .hi{justify-content:flex-end}
 .tiles{min-height:0;padding-top:12px;padding-bottom:6px}
+/* tap-accuracy fixes */
+html,body,button,a,input,select,label,.tile{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+#amb,#amb *,#amb:before,#amb:after,.tile span,.tile b,button svg,button span,#tabbar *{pointer-events:none}
+#tabbar button{pointer-events:auto}
+.sheet:not(.open){visibility:hidden;pointer-events:none}
+.sheet{transition:transform .3s,opacity .3s,visibility 0s .3s}.sheet.open{visibility:visible;pointer-events:auto;transition:transform .3s,opacity .3s,visibility 0s}
+.view:not(.on){display:none!important;pointer-events:none}
+.modal.hidden{display:none!important}
+body.creating #tabbar{visibility:hidden;pointer-events:none}
+.tile span{will-change:auto}
