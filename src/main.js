@@ -7,13 +7,14 @@ const VARIANTS = ['Halo', 'Ripples', 'Creature', 'Black hole', 'Drip'];
 const FONTS = [['Serif', 'Georgia, serif'], ['Sans', '-apple-system, Helvetica, sans-serif'], ['Rounded', 'ui-rounded, -apple-system, sans-serif'], ['Mono', 'ui-monospace, Menlo, monospace'], ['Bold', 'Impact, sans-serif']];
 const st = { cat: 'Gradients', seed: 12345, pal: PALS[0].slice(), dev: 0, amoled: false, variant: 0, mode: 'Lock', font: FONTS[0][1], iconStyle: 'Glass', islandOutline: true };
 const cv = $('#cv');
-const opts = () => ({ ...st, text: $('#txt').value, variant: st.cat === 'Island' ? st.variant : undefined });
-const size = () => { if (st.dev) return DEVICES[st.dev].slice(1); const d = devicePixelRatio || 1; return [Math.round(Math.min(screen.width, screen.height) * d), Math.round(Math.max(screen.width, screen.height) * d)]; };
+const opts = () => ({ ...st, scale: scale(), text: $('#txt').value, variant: st.cat === 'Island' ? st.variant : undefined });
+const scale = () => st.dev ? DEVICES[st.dev][3] : (devicePixelRatio || 1);
+const size = () => { if (st.dev) return DEVICES[st.dev].slice(1, 3); const d = devicePixelRatio || 1; return [Math.round(Math.min(screen.width, screen.height) * d), Math.round(Math.max(screen.width, screen.height) * d)]; };
 
 function seg(el, items, cur, on) { el.innerHTML = items.map(([l, v]) => `<button data-v="${v}" class="${v == cur ? 'on' : ''}">${l}</button>`).join(''); el.onclick = e => { const b = e.target.closest('button'); if (!b) return; el.querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b)); on(b.dataset.v); }; }
 
 function overlay(W, H) {
-  const ov = $('#ov'); ov.setAttribute('viewBox', `0 0 ${W} ${H}`); const s = W >= 1000 ? 3 : 2, ig = islandGeom(W, H);
+  const ov = $('#ov'); ov.setAttribute('viewBox', `0 0 ${W} ${H}`); const s = scale(), ig = islandGeom(W, H, st.dev, s);
   $('#ovIsland').innerHTML = ig && st.islandOutline ? `<rect x="${ig.x - ig.w / 2}" y="${ig.y - ig.h / 2}" width="${ig.w}" height="${ig.h}" rx="${ig.h / 2}" fill="#000" stroke="#ff3b30" stroke-width="${s * 1.2}" stroke-dasharray="${s * 4} ${s * 3}"/>` : '';
   const d = new Date(), f = `font-family="-apple-system,system-ui,sans-serif" fill="#fff" text-anchor="middle"`;
   let g = '';
@@ -31,7 +32,7 @@ function overlay(W, H) {
 }
 function render() {
   const [W, H] = size(); paint(cv, W, H, opts()); overlay(W, H);
-  $('#res').textContent = `${W} × ${H} px` + (islandGeom(W, H) ? ' · Dynamic Island' : '');
+  $('#res').textContent = `${W} × ${H} px` + (() => { const g = islandGeom(W, H, st.dev, scale()); return g ? ' · Dynamic Island' + (g.est ? ' (estimated size)' : g.approx ? ' (approx., unknown model)' : '') : ''; })();
   $('#textOpts').style.display = st.cat === 'Text' ? '' : 'none';
   $('#variant').style.display = $('#islandNote').style.display = st.cat === 'Island' ? '' : 'none';
   $$('#chips button').forEach(b => b.classList.toggle('on', b.dataset.c === st.cat));

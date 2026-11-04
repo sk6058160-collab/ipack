@@ -1,12 +1,20 @@
 // Rendering engine: all wallpapers are drawn on-device with canvas 2D.
 export const ISLAND_PT = { w: 126, h: 37, top: 11 }; // approx. Dynamic Island size/offset in points
-export function islandGeom(W, H) {
-  const s = 3; const ptW = W / s, ptH = H / s;
-  if (!(ptH >= 852 && ptW >= 393 && ptH / ptW > 2.1)) return null; // only 14 Pro / 15 / 16 class phones
-  const top = ptW >= 402 ? 14 : ISLAND_PT.top; // 16 Pro / Pro Max sit slightly lower
-  return { x: W / 2, y: (top + ISLAND_PT.h / 2) * s, w: ISLAND_PT.w * s, h: ISLAND_PT.h * s };
+// Device presets: [label, W px, H px, scale, island {w,h,top} in pt or null]
+const DI = { w: 126, h: 37, top: 11 }, DI16 = { w: 126, h: 37, top: 14 }, DI18 = { w: 82, h: 37, top: 14, est: true };
+const DEVICES = [['Auto',0,0,0,null],
+ ['iPhone 18 Pro Max (island est.)',1320,2868,3,DI18],['iPhone 18 Pro (island est.)',1206,2622,3,DI18],
+ ['iPhone 17 Pro Max',1320,2868,3,DI16],['iPhone 17 Pro / 17',1206,2622,3,DI16],['iPhone Air',1260,2736,3,DI16],['iPhone 17e / 16e',1170,2532,3,null],
+ ['iPhone 16 Pro Max',1320,2868,3,DI16],['iPhone 16 Pro',1206,2622,3,DI16],['iPhone 16 Plus / 15 Plus / 15 Pro Max / 14 Pro Max',1290,2796,3,DI],['iPhone 16 / 15 / 15 Pro / 14 Pro',1179,2556,3,DI],
+ ['iPhone 14 / 13 / 12',1170,2532,3,null],['iPhone 13 mini / 12 mini',1080,2340,3,null],['iPhone 11 / XR',828,1792,2,null],['iPhone 11 Pro Max / XS Max',1242,2688,3,null],['iPhone SE (2nd/3rd)',750,1334,2,null]];
+// Island geometry in px. dev = preset index (0 = auto). Auto: match a known size, otherwise guess from aspect ratio (approx).
+export function islandGeom(W, H, dev = 0, scale = 3) {
+  let isl, s = scale;
+  if (dev) { [, , , s, isl] = DEVICES[dev]; }
+  else { const m = DEVICES.find((x, i) => i && x[1] === W && x[2] === H); if (m) { s = m[3]; isl = m[4]; } else isl = (H / W > 2.1 && W / s >= 393) ? { ...DI16, approx: true } : null; }
+  if (!isl) return null;
+  return { x: W / 2, y: (isl.top + isl.h / 2) * s, w: isl.w * s, h: isl.h * s, est: isl.est, approx: isl.approx };
 }
-const DEVICES = [['Auto',0,0],['iPhone 16 Pro Max',1320,2868],['iPhone 16 Pro',1206,2622],['iPhone 16 Plus / 15 Plus / 14 Pro Max',1290,2796],['iPhone 16 / 15 / 15 Pro / 14 Pro',1179,2556],['iPhone 14 / 13 / 12',1170,2532],['iPhone 13 mini / 12 mini',1080,2340],['iPhone 11 / XR',828,1792],['iPhone 11 Pro Max / XS Max',1242,2688],['iPhone SE (2nd/3rd)',750,1334]];
 const CATS = ['Gradients','Patterns','Abstract','Text','Dark','Cars','3D','Heroes','Island'];
 const PALS = [['#7c5cff','#ff5c9a','#ffb86b'],['#00c6ff','#0072ff','#00ffa3'],['#ff512f','#f09819','#dd2476'],['#11998e','#38ef7d','#0f3443'],['#fc466b','#3f5efb','#1b1b3a'],['#f7971e','#ffd200','#23074d'],['#00f5d4','#9b5de5','#f15bb5']];
 const HERO_PALS = [['#c8102e','#ffc72c','#0a0a14'],['#1e3a8a','#fbbf24','#0b1020'],['#0f172a','#facc15','#020617'],['#7f1d1d','#f59e0b','#111827']];
@@ -110,7 +118,7 @@ const draw = {
   },
 
   Island(W, H, p) {
-    const g = islandGeom(W, H) || { x: W / 2, y: W * .074, w: W * .32, h: W * .094 };
+    const g = islandGeom(W, H, O.dev, O.scale) || { x: W / 2, y: W * .074, w: W * .32, h: W * .094 };
     const { x, y, w, h } = g, t = O.variant ?? Math.floor(rr(0, 5));
     bg(W, H, '#000');
     const pill = (dx = 0, dy = 0, sc = 1) => { ctx.beginPath(); ctx.roundRect(x - w * sc / 2 + dx, y - h * sc / 2 + dy, w * sc, h * sc, h * sc / 2); };
