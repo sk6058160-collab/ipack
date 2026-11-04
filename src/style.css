@@ -42,8 +42,12 @@ body.immersive .sheet{transform:translateY(130%);opacity:0}body.immersive #tabba
 #tabbar button{min-width:0;height:49px;border:0;background:none;padding:4px 0 0;color:var(--sec);display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:2px;cursor:pointer}
 #tabbar svg{width:28px;height:28px;flex:none;display:block}#tabbar span{font-size:10px;line-height:12px;font-weight:500;white-space:nowrap;letter-spacing:.1px}#tabbar button.on{color:var(--tint)}
 #tabbar button.on svg path,#tabbar button.on svg rect,#tabbar button.on svg circle{stroke-width:2.4}
-#iconGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:18px 14px;padding:12px 6px}#iconGrid figure{margin:0;text-align:center;cursor:pointer}#iconGrid canvas{width:100%;aspect-ratio:1;border-radius:22.5%}#iconGrid figcaption{font-size:11px;margin-top:4px}
+#iconGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:18px 14px;padding:12px 6px}#iconGrid figure{margin:0;text-align:center;cursor:pointer}#iconGrid canvas{width:100%;aspect-ratio:1}#iconGrid figcaption{font-size:11px;margin-top:4px}
 .row2{display:flex}.row2 .btn{flex:1}
 .steps{margin:0;padding:12px 16px 12px 36px;font-size:15px}.steps li{margin:6px 0}
 #gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}#gallery img{width:100%;aspect-ratio:9/19.5;object-fit:cover;border-radius:12px}
 .modal{position:fixed;inset:0;background:#0006;display:flex;align-items:flex-end;z-index:9}.sheet-card{background:var(--card);width:100%;border-radius:22px 22px 0 0;padding:20px 20px calc(20px + env(safe-area-inset-bottom))}.sheet-card .btn{width:100%}.hidden{display:none}
+
+#photoGrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-top:8px}#photoGrid img{width:100%;aspect-ratio:1290/2796;object-fit:cover;border-radius:12px;background:var(--fill);cursor:pointer}
+.pv{flex-direction:column;justify-content:flex-end;background:#000}.pv img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}.pv .sheet-card{position:relative;background:var(--bar);-webkit-backdrop-filter:blur(30px);backdrop-filter:blur(30px)}.pv .actions{grid-template-columns:1fr 1fr}
+.sheet-card.tall{max-height:85dvh;overflow:auto}details{margin:8px 0;font-size:14px}pre{white-space:pre-wrap;font-size:11px;color:var(--sec);max-height:200px;overflow:auto}a{color:var(--tint)}

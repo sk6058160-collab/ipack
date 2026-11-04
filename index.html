@@ -2,41 +2,40 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="iPack">
-<meta name="theme-color" content="#f2f2f7" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#050a1a">
 <meta name="color-scheme" content="light dark">
 <link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
-<title>iPack</title><link rel="stylesheet" href="/src/style.css"></head><body>
-<section id="v-explore" class="view scroll"><h1 class="large">Explore</h1><p class="sub">Original wallpapers, drawn on your iPhone.</p><div id="catList" class="group"></div></section>
-
-<section id="v-create" class="view">
- <canvas id="cv"></canvas>
- <svg id="ov" preserveAspectRatio="xMidYMid slice"><g id="ovIsland"></g><g id="ovClock"></g></svg>
- <div id="sheet" class="sheet">
-  <div class="grab" id="grab"><span></span></div>
-  <div class="actions"><button id="rand" class="btn tinted">Shuffle</button><button id="save" class="btn filled">Save</button><button id="fav" class="btn round" aria-label="Favorite">♡</button></div>
-  <div class="chips" id="chips"></div>
-  <div class="more">
-   <div id="islandNote" class="note">The Dynamic Island itself can't be changed — these designs are built around it. Outline shows its approx. position for the chosen model.</div>
-   <div class="seg" id="variant"></div>
-   <div class="label">Preview</div><div class="seg" id="mode"></div>
-   <div class="group">
-    <label class="cell">AMOLED black<input type="checkbox" class="tog" id="amoled"></label>
-    <label class="cell">Island outline<input type="checkbox" class="tog" id="islandT" checked></label>
-    <div class="cell">Colors<span id="pal"></span></div>
-    <label class="cell">Device<select id="device"></select></label>
-    <div class="cell muted" id="res"></div>
-   </div>
-   <div id="textOpts"><div class="group"><div class="cell"><input id="txt" value="Stay hungry. Stay foolish." placeholder="Your quote"></div></div><div class="seg" id="font"></div></div>
-   <button class="btn plain" id="howBtn">How to set as wallpaper</button>
-  </div>
- </div>
- <div id="hint" class="hint">Tap the wallpaper to hide controls</div>
+<title>iPack</title><link rel="stylesheet" href="/src/style.css"><link rel="stylesheet" href="/src/theme.css"></head><body>
+<div id="amb"><div class="l a"></div><div class="l b"></div></div>
+<section id="v-explore" class="view">
+ <header class="ptop"><div id="ctabs" class="ctabs"></div><button id="snd" class="rb sm" aria-label="UI sound">♪̸</button></header>
+ <div id="tiles" class="tiles"></div>
+ <div class="hero"><div class="hp"><img id="heroImg" alt=""><canvas id="heroCv"></canvas></div>
+  <div class="hi"><small id="heroKind"></small><h2 id="heroTitle"></h2><p id="heroSub" class="sub"></p>
+   <button id="heroSet" class="pill">Set / Save</button><button id="heroEdit" class="pill ghost">Customize</button>
+   <div class="rbs"><button id="heroFav" class="rb" aria-label="Favorite">♡</button><button id="heroShuf" class="rb" aria-label="Shuffle">⤮</button><button id="heroInfo" class="rb" aria-label="Info">i</button></div></div></div>
 </section>
 
-<section id="v-icons" class="view scroll"><h1 class="large">Icons</h1><p class="sub">Generic glyph icons that match your wallpaper palette.</p>
- <div class="seg" id="iconStyle"></div>
+<section id="v-create" class="view">
+ <div id="stage"><canvas id="cv"></canvas>
+  <svg id="ov" preserveAspectRatio="xMidYMid slice"><g id="ovIsland"></g><g id="ovDate" class="hit"></g><g id="ovClock" class="hit"></g><g id="ovWidgets" class="hit"></g></svg></div>
+ <div class="ctop"><button id="cCancel" class="pillsm">Cancel</button><div id="dots" class="dots"></div><button id="cDone" class="pillsm on">Done</button></div>
+ <div id="ctool" class="ctool">
+  <button data-t="filter" class="rb"><svg viewBox="0 0 24 24"><circle cx="9" cy="10" r="5"/><circle cx="15" cy="10" r="5"/><circle cx="12" cy="15" r="5"/></svg><span>Style</span></button>
+  <button data-t="depth" class="rb" id="depthB"><svg viewBox="0 0 24 24"><path d="M3 18l6-8 4 5 3-3 5 6z"/><circle cx="16" cy="6" r="2"/></svg><span>Depth</span></button>
+  <button data-t="palette" class="rb"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18c1.5 0 2-1 2-2s-1-2 0-3h3a4 4 0 0 0 4-4c0-5-4-9-9-9z"/><circle cx="7.5" cy="11" r="1"/><circle cx="10" cy="7" r="1"/><circle cx="15" cy="7.5" r="1"/></svg><span>Palette</span></button>
+  <button data-t="shuffle" class="rb"><svg viewBox="0 0 24 24"><path d="M4 7h3c5 0 5 10 10 10h3M4 17h3c2 0 3-1.5 4-3.5M14 9.5C15 8 16 7 17 7h3M18 4l3 3-3 3M18 14l3 3-3 3"/></svg><span>Shuffle</span></button>
+  <button data-t="pick" class="rb"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg><span>Photos</span></button>
+ </div>
+ <div id="csheet" class="csheet"><div class="grab"><span></span></div><div id="csBody"></div></div>
+ <div id="hint" class="hint">Swipe to change style · tap the clock to edit</div>
+ <div id="islandNote" style="display:none"></div><div id="res" style="display:none"></div>
+</section>
+
+<section id="v-icons" class="view scroll"><header class="ptop"><div id="iconPack" class="ctabs"></div></header><h1 class="large">Icons</h1><p class="sub">Colorful, generic app glyphs. No brand logos.</p>
+ <div class="seg" id="iconStyle"></div><div class="seg" id="iconShape"></div><p class="sub" id="packInfo"></p>
  <div id="iconGrid"></div>
- <div class="row2"><button id="zip" class="btn filled">Save all (ZIP)</button></div>
+ <div class="row2"><button id="zip" class="btn filled">Save all (ZIP)</button></div><button class="btn plain" id="creditsBtn">Licenses &amp; credits</button>
  <p class="sub">Tap an icon to share/save its 1024px PNG.</p>
  <div class="label">Use as a Home Screen icon</div>
  <div class="group"><ol class="steps"><li>Open <b>Shortcuts</b> → <b>+</b> New Shortcut</li><li>Add action <b>Open App</b> → pick the app</li><li>Tap <b>Share</b> → <b>Add to Home Screen</b></li><li>Tap the small icon → <b>Choose Photo</b> → pick the saved icon</li><li>Name it, tap <b>Add</b>. Hide the original app in App Library.</li></ol></div>
@@ -46,5 +45,8 @@
 
 <nav id="tabbar"><button data-v="explore"><svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="14" cy="14" r="10"/><path d="M18 10l-2.5 5.5L10 18l2.5-5.5z"/></svg><span>Explore</span></button><button data-v="create"><svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 23l11-11"/><path d="M16 12l3-3 2 2-3 3z"/><path d="M20 3v3M18.5 4.5h3M7 6v2M6 7h2M23 15v2M22 16h2"/></svg><span>Create</span></button><button data-v="icons"><svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="8" height="8" rx="2"/><rect x="16" y="4" width="8" height="8" rx="2"/><rect x="4" y="16" width="8" height="8" rx="2"/><rect x="16" y="16" width="8" height="8" rx="2"/></svg><span>Icons</span></button><button data-v="favs"><svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 23s-9-5.5-9-12a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 6.5-9 12-9 12z"/></svg><span>Favorites</span></button></nav>
 
+<div id="credits" class="modal hidden"><div class="sheet-card tall"><h2>Licenses &amp; credits</h2><div id="creditsBody"></div><button class="btn filled" id="creditsClose">Done</button></div></div>
+<div id="info" class="modal hidden"><div class="sheet-card"><div id="infoBody"></div><button class="btn filled" id="infoClose">Close</button></div></div>
+<div id="doneM" class="modal hidden"><div class="sheet-card"><h2>Save wallpaper</h2><button class="btn filled wide" id="saveClock">With clock &amp; date</button><button class="btn tinted wide" id="savePlain">Wallpaper only</button><button class="btn plain" id="howBtn">How to set as wallpaper</button><button class="btn plain" id="doneClose">Cancel</button></div></div>
 <div id="how" class="modal hidden"><div class="sheet-card"><h2>Set as wallpaper</h2><ol class="steps"><li>Tap <b>Save</b> → <b>Save Image</b>.</li><li>Open <b>Photos</b> → the image → <b>Share</b> → <b>Use as Wallpaper</b>.</li><li>Adjust and tap <b>Add</b>.</li></ol><p class="sub">iOS doesn't allow apps to set wallpaper automatically. Tip: add iPack to your Home Screen (Safari → Share → Add to Home Screen) for full screen.</p><button class="btn filled" id="howClose">Got it</button></div></div>
 <script type="module" src="/src/main.js"></script></body></html>

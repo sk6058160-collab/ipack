@@ -30,14 +30,28 @@ function grain(W, H, a = .04) { for (let i = 0; i < W * H / 400; i++) { ctx.fill
 
 const draw = {
   Gradients(W, H, p) {
+    const t = Math.floor(rr(0, 4));
     ctx.fillStyle = lin(W, H, p); ctx.fillRect(0, 0, W, H);
-    if (R() < .7) for (let i = 0; i < 5; i++) blob(rr(0, W), rr(0, H), rr(.4, .9) * W, pick(p), .7); // mesh
-    grain(W, H);
+    if (t == 0) for (let i = 0; i < 7; i++) blob(rr(-.2, 1.2) * W, rr(-.1, 1.1) * H, rr(.5, 1.1) * W, pick(p), .75); // rich mesh
+    else if (t == 1) { // aurora ribbons
+      bg(W, H, '#05060d'); blob(W * .5, H * .2, W * 1.2, p[2], .5);
+      for (let k = 0; k < 5; k++) { const y0 = rr(.2, .7) * H, amp = rr(.05, .15) * H, f = rr(1, 3), c = pick(p);
+        for (let j = 0; j < 26; j++) { ctx.beginPath(); for (let x = -20; x <= W + 20; x += W / 30) ctx.lineTo(x, y0 + Math.sin(x / W * f * 3.14 + k) * amp + j * H * .006);
+          ctx.strokeStyle = hex(c, .06 * (1 - j / 26)); ctx.lineWidth = W * .03; ctx.stroke(); } }
+    } else if (t == 2) { // conic glow
+      const g = ctx.createConicGradient(rr(0, 6.28), W * rr(.3, .7), H * rr(.3, .7)); [...p, p[0]].forEach((c, i, a) => g.addColorStop(i / (a.length - 1), c)); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+      for (let i = 0; i < 4; i++) blob(rr(0, W), rr(0, H), W * .9, pick(p), .6);
+    } else { // glass orbs over mesh
+      for (let i = 0; i < 5; i++) blob(rr(0, W), rr(0, H), W, pick(p), .6);
+      for (let i = 0; i < 4; i++) { const r = rr(.15, .4) * W, x = rr(0, W), y = rr(0, H); const g = ctx.createLinearGradient(x - r, y - r, x + r, y + r);
+        g.addColorStop(0, 'rgba(255,255,255,.35)'); g.addColorStop(.5, 'rgba(255,255,255,.06)'); g.addColorStop(1, 'rgba(255,255,255,.18)'); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill();
+        ctx.strokeStyle = 'rgba(255,255,255,.4)'; ctx.lineWidth = W * .003; ctx.stroke(); }
+    }
   },
   Patterns(W, H, p) {
     bg(W, H, p[2]); const s = W / Math.floor(rr(5, 12)), t = Math.floor(rr(0, 4));
     for (let y = 0; y < H + s; y += s) for (let x = 0; x < W + s; x += s) {
-      ctx.fillStyle = pick(p.slice(0, 2)); ctx.globalAlpha = rr(.4, 1); ctx.beginPath();
+      const tg = ctx.createLinearGradient(x, y, x + s, y + s); tg.addColorStop(0, pick(p.slice(0, 2))); tg.addColorStop(1, hex(pick(p), .6)); ctx.fillStyle = tg; ctx.globalAlpha = rr(.55, 1); ctx.beginPath();
       if (t == 0) { ctx.moveTo(x, y); ctx.lineTo(x + s, y); ctx.lineTo(R() < .5 ? x : x + s, y + s); }
       else if (t == 1) ctx.arc(x + s / 2, y + s / 2, s * rr(.15, .45), 0, 7);
       else if (t == 2) { ctx.arc(x + (R() < .5 ? 0 : s), y + (R() < .5 ? 0 : s), s, 0, 7); }
@@ -138,8 +152,10 @@ const draw = {
       pill(); ctx.fillStyle = '#000'; ctx.fill();
     } else if (t == 3) { // black hole
       for (let i = 0; i < 600; i++) { ctx.fillStyle = `rgba(255,255,255,${rr(.1, .9)})`; ctx.fillRect(rr(0, W), rr(0, H), rr(1, 3), rr(1, 3)); }
-      for (let i = 0; i < 40; i++) { ctx.save(); ctx.translate(x, y); ctx.scale(1, .32); ctx.beginPath(); ctx.arc(0, 0, w * (.8 + i * .06), 0, 7); ctx.restore();
-        ctx.strokeStyle = hex(i % 2 ? p[0] : (p[1]), .5 - i * .011); ctx.lineWidth = W * .006; ctx.stroke(); }
+      blob(x, y, W * .9, p[0], .55); blob(x, y, W * .35, '#ffd9a0', .7);
+      for (let i = 0; i < 46; i++) { ctx.save(); ctx.translate(x, y); ctx.rotate(-.12); ctx.scale(1, .3); ctx.beginPath(); ctx.arc(0, 0, w * (.7 + i * .055), 0, 7); ctx.restore();
+        ctx.strokeStyle = i < 10 ? `rgba(255,${200 + i * 5},160,${.95 - i * .05})` : hex(i % 2 ? p[0] : p[1], Math.max(.05, .8 - i * .016)); ctx.lineWidth = W * (i < 10 ? .009 : .006); ctx.stroke(); }
+      ctx.save(); ctx.shadowColor = '#ffe2b0'; ctx.shadowBlur = W * .05; ctx.strokeStyle = '#fff3d6'; ctx.lineWidth = W * .006; pill(0, 0, 1.3); ctx.stroke(); ctx.restore();
       ctx.save(); ctx.shadowColor = p[0]; ctx.shadowBlur = W * .08; pill(0, 0, 1.15); ctx.fillStyle = '#000'; ctx.fill(); ctx.restore();
       blob(x, y + H * .45, W * .8, p[1], .25);
     } else { // liquid drip
@@ -179,11 +195,20 @@ const draw = {
     }
   },
 };
+// premium finish: soft top light, vignette, fine film grain (deterministic)
+function finish(W, H) {
+  const l = ctx.createRadialGradient(W * .3, -H * .05, 0, W * .3, -H * .05, H * .6); l.addColorStop(0, 'rgba(255,255,255,.10)'); l.addColorStop(1, 'rgba(255,255,255,0)'); ctx.fillStyle = l; ctx.fillRect(0, 0, W, H);
+  const v = ctx.createRadialGradient(W / 2, H / 2, H * .25, W / 2, H / 2, H * .75); v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,.38)'); ctx.fillStyle = v; ctx.fillRect(0, 0, W, H);
+  if (W * H > 200000) { const n = document.createElement('canvas'); n.width = n.height = 256; const nx = n.getContext('2d'), d = nx.createImageData(256, 256);
+    for (let i = 0; i < d.data.length; i += 4) { const g = R() * 255; d.data[i] = d.data[i + 1] = d.data[i + 2] = g; d.data[i + 3] = 14; } nx.putImageData(d, 0, 0);
+    ctx.fillStyle = ctx.createPattern(n, 'repeat'); ctx.globalCompositeOperation = 'overlay'; ctx.fillRect(0, 0, W, H); ctx.globalCompositeOperation = 'source-over'; }
+}
 function bg2(x, y, w, h, c) { ctx.fillStyle = c; ctx.fillRect(x, y, w, h); }
 export function paint(canvas, W, H, opts) {
   cv = canvas; canvas.width = W; canvas.height = H; ctx = canvas.getContext('2d'); O = opts; R = rng(opts.seed);
   const p = opts.pal.slice(); if (opts.amoled && opts.cat !== 'Text') p[2] = '#000';
   draw[opts.cat](W, H, p);
+  if (opts.cat !== 'Text') finish(W, H);
   if (opts.amoled && !['Dark', 'Text', 'Island'].includes(opts.cat)) { ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.fillRect(0, 0, W, H); }
 }
 export { DEVICES, CATS, PALS, HERO_PALS };
